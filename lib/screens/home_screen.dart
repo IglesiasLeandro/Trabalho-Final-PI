@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/screens/detector_screen.dart';
 import 'package:flutter_application_1/screens/gallery_screen.dart';
-import 'package:shared_preferences/shared_preferences.dart'; // 1. Importe o pacote
+import 'package:shared_preferences/shared_preferences.dart';
 
-// 2. A tela foi transformada em StatefulWidget para usar o initState
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
@@ -15,21 +14,14 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    _checkForRestore(); // 3. Verifica o estado assim que a tela é construída
+    _checkForRestore();
   }
 
-  // 4. Lógica de restauração para lidar com a "Morte de Processo" do Android
   Future<void> _checkForRestore() async {
     final prefs = await SharedPreferences.getInstance();
-
-    // Verifica se a "lembrança" de que estávamos na tela de detecção existe
     if (prefs.getBool('wasOnDetectorScreen') ?? false) {
-      // Limpa a "lembrança" para não acontecer de novo sem querer
       await prefs.setBool('wasOnDetectorScreen', false);
-
-      // Navega para a tela de detecção
       if (mounted) {
-        // 'mounted' verifica se a tela ainda existe
         Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => const DetectorScreen()),
@@ -40,10 +32,21 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // O resto do seu código da interface continua exatamente igual
+    final Size screenSize = MediaQuery.of(context).size;
+    final double screenHeight = screenSize.height;
+    final double screenWidth = screenSize.width;
+
     final ButtonStyle buttonStyle = ElevatedButton.styleFrom(
-      padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 20),
-      textStyle: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+      padding: EdgeInsets.symmetric(
+        //--NOVO AJUSTE: Botões mais estreitos e finos--
+        horizontal: screenWidth * 0.07, // Antes era 0.08
+        vertical: screenHeight * 0.015, // Antes era 0.018
+      ),
+      textStyle: TextStyle(
+        //--NOVO AJUSTE: Fonte do botão ligeiramente menor--
+        fontSize: screenWidth * 0.038, // Antes era 0.04
+        fontWeight: FontWeight.bold,
+      ),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
     );
 
@@ -55,51 +58,62 @@ class _HomeScreenState extends State<HomeScreen> {
           Container(color: Colors.black.withOpacity(0.5)),
           SafeArea(
             child: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Text(
-                    'Detector de Azulejos',
-                    style: TextStyle(
-                      fontSize: 36,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                      letterSpacing: 1.2,
-                    ),
-                  ),
-                  const SizedBox(height: 50),
-                  ElevatedButton.icon(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const DetectorScreen(),
-                        ),
-                      );
-                    },
-                    style: buttonStyle,
-                    icon: const Icon(Icons.camera_alt),
-                    label: const Text('Iniciar Detector'),
-                  ),
-                  const SizedBox(height: 20),
-                  ElevatedButton.icon(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const GalleryScreen(),
-                        ),
-                      );
-                    },
-                    style: buttonStyle.copyWith(
-                      backgroundColor: MaterialStateProperty.all(
-                        Colors.white30,
+              child: Padding(
+                // Adicionado um Padding para garantir que o conteúdo não cole nas bordas
+                padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      'Detector de Azulejos',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        //--NOVO AJUSTE: Redução significativa no título--
+                        fontSize: screenWidth * 0.1, // Antes era 0.07
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                        letterSpacing: 1.2,
                       ),
                     ),
-                    icon: const Icon(Icons.grid_view_rounded),
-                    label: const Text('Ver Catálogo'),
-                  ),
-                ],
+                    //--NOVO AJUSTE: Espaçamento principal ainda menor--
+                    SizedBox(height: screenHeight * 0.04), // Antes era 0.05
+
+                    ElevatedButton.icon(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const DetectorScreen(),
+                          ),
+                        );
+                      },
+                      style: buttonStyle,
+                      icon: const Icon(Icons.camera_alt),
+                      label: const Text('Iniciar Detector'),
+                    ),
+
+                    //--NOVO AJUSTE: Espaçamento entre botões menor--
+                    SizedBox(height: screenHeight * 0.018), // Antes era 0.02
+
+                    ElevatedButton.icon(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const GalleryScreen(),
+                          ),
+                        );
+                      },
+                      style: buttonStyle.copyWith(
+                        backgroundColor: MaterialStateProperty.all(
+                          Colors.white30,
+                        ),
+                      ),
+                      icon: const Icon(Icons.grid_view_rounded),
+                      label: const Text('Ver Catálogo'),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
